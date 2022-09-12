@@ -10,6 +10,9 @@ packages = [{include = "text_classifier_with_web_scraping"}]
 python = "^3.8"
 config = "^0.5.1"
 praw = "^7.6.0"
+numpy = "^1.23.3"
+sklearn = "^0.0"
+seaborn = "^0.12.0"
 
 
 [build-system]
