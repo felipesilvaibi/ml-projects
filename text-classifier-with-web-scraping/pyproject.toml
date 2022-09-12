@@ -8,6 +8,8 @@ packages = [{include = "text_classifier_with_web_scraping"}]
 
 [tool.poetry.dependencies]
 python = "^3.8"
+config = "^0.5.1"
+praw = "^7.6.0"
 
 
 [build-system]
