@@ -13,6 +13,7 @@ praw = "^7.6.0"
 numpy = "^1.23.3"
 sklearn = "^0.0"
 seaborn = "^0.12.0"
+poetry-dotenv-plugin = "^0.1.0"
 
 
 [build-system]
