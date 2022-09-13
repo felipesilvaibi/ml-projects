@@ -6,6 +6,9 @@ from dotenv import load_dotenv
 
 import re
 import praw
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.decomposition import TruncatedSVD
 
 ## Carregando os Dados
 
@@ -54,3 +57,55 @@ def carrega_dados():
               "_" * 80 + '\n')
     
     return data, labels
+
+## Divisão em Dados de Treino e Teste
+
+# Variáveis de controle
+TEST_SIZE = .2
+RANDOM_STATE = 0
+
+
+# Função para split dos dados
+def split_data():
+
+    print(f"Split {100 * TEST_SIZE}% dos dados para teste e avaliação do modelo...")
+    
+    # Split dos dados
+    X_treino, X_teste, y_treino, y_teste = train_test_split(data, 
+                                                            labels, 
+                                                            test_size = TEST_SIZE, 
+                                                            random_state = RANDOM_STATE)
+
+    print(f"{len(y_teste)} amostras de teste.")
+    
+    return X_treino, X_teste, y_treino, y_teste
+
+## Pré-Processamento de Dados e Extração de Atributos
+
+# - Remove símbolos, números e strings semelhantes a url com pré-processador personalizado
+# - Vetoriza texto usando o termo frequência inversa de frequência de documento
+# - Reduz para valores principais usando decomposição de valor singular
+# - Particiona dados e rótulos em conjuntos de treinamento / validação
+
+# Variáveis de controle
+MIN_DOC_FREQ = 1
+N_COMPONENTS = 1000
+N_ITER = 30
+
+# Função para o pipeline de pré-processamento
+def preprocessing_pipeline():
+    
+    # Remove caracteres não "alfabéticos"
+    pattern = r'\W|\d|http.*\s+|www.*\s+'
+    preprocessor = lambda text: re.sub(pattern, ' ', text)
+
+    # Vetorização TF-IDF
+    vectorizer = TfidfVectorizer(preprocessor = preprocessor, stop_words = 'english', min_df = MIN_DOC_FREQ)
+
+    # Reduzindo a dimensionalidade da matriz TF-IDF 
+    decomposition = TruncatedSVD(n_components = N_COMPONENTS, n_iter = N_ITER)
+    
+    # Pipeline
+    pipeline = [('tfidf', vectorizer), ('svd', decomposition)]
+
+    return pipeline
