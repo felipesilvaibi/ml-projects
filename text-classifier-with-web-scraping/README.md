@@ -1,7 +1,5 @@
 ## Modelo de Classificação de Texto com Dados Extraídos do Reddit (via web scraping)
 
-***
-
 **Pre requisitos:**
 
 1. Criar conta no Reddit
