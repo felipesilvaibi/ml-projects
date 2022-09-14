@@ -6,9 +6,19 @@ from dotenv import load_dotenv
 
 import re
 import praw
+import config
+import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import TruncatedSVD
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegressionCV
+from sklearn.metrics import classification_report
+from sklearn.pipeline import Pipeline
+from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 ## Carregando os Dados
 
@@ -109,3 +119,113 @@ def preprocessing_pipeline():
     pipeline = [('tfidf', vectorizer), ('svd', decomposition)]
 
     return pipeline
+
+## Seleção do Modelo
+
+# Variáveis de controle
+N_NEIGHBORS = 4
+CV = 3
+
+# Função para criar os modelos
+def cria_modelos():
+
+    modelo_1 = KNeighborsClassifier(n_neighbors = N_NEIGHBORS)
+    modelo_2 = RandomForestClassifier(random_state = RANDOM_STATE)
+    modelo_3 = LogisticRegressionCV(cv = CV, random_state = RANDOM_STATE)
+
+    modelos = [("KNN", modelo_1), ("RandomForest", modelo_2), ("LogReg", modelo_3)]
+    
+    return modelos
+
+## Treinamento e Avaliação dos Modelos
+
+# Função para treinamento e avaliação dos modelos
+def treina_avalia(modelos, pipeline, X_treino, X_teste, y_treino, y_teste):
+    
+    resultados = []
+    
+    # Loop
+    for name, modelo in modelos:
+
+        # Pipeline
+        pipe = Pipeline(pipeline + [(name, modelo)])
+
+        # Treinamento
+        print(f"Treinando o modelo {name} com dados de treino...")
+        pipe.fit(X_treino, y_treino)
+
+        # Previsões com dados de teste
+        y_pred = pipe.predict(X_teste)
+
+        # Calcula as métricas
+        report = classification_report(y_teste, y_pred)
+        print("Relatório de Classificação\n", report)
+
+        resultados.append([modelo, {'modelo': name, 'previsoes': y_pred, 'report': report,}])           
+
+    return resultados
+
+## Executando o Pipeline Para Todos os Modelos
+
+# Pipeline de Machine Learning
+if __name__ == "__main__":
+    
+    # Carrega os dados
+    data, labels = carrega_dados()
+    
+    # Faz a divisão
+    X_treino, X_teste, y_treino, y_teste = split_data()
+    
+    # Pipeline de pré-processamento
+    pipeline = preprocessing_pipeline()
+    
+    # Cria os modelos
+    all_models = cria_modelos()
+    
+    # Treina e avalia os modelos
+    resultados = treina_avalia(all_models, pipeline, X_treino, X_teste, y_treino, y_teste)
+
+print("Concluído com Sucesso!")
+
+## Visualizando os Resultados
+
+def plot_distribution():
+    _, counts = np.unique(labels, return_counts = True)
+    sns.set_theme(style = "whitegrid")
+    plt.figure(figsize = (15, 6), dpi = 120)
+    plt.title("Número de Posts Por Assunto")
+    sns.barplot(x = assuntos, y = counts)
+    plt.legend([' '.join([f.title(),f"- {c} posts"]) for f,c in zip(assuntos, counts)])
+    plt.show()
+
+def plot_confusion(result):
+    print("Relatório de Classificação\n", result[-1]['report'])
+    y_pred = result[-1]['previsoes']
+    conf_matrix = confusion_matrix(y_teste, y_pred)
+    _, test_counts = np.unique(y_teste, return_counts = True)
+    conf_matrix_percent = conf_matrix / test_counts.transpose() * 100
+    plt.figure(figsize = (9,8), dpi = 120)
+    plt.title(result[-1]['modelo'].upper() + " Resultados")
+    plt.xlabel("Valor Real")
+    plt.ylabel("Previsão do Modelo")
+    ticklabels = [f"r/{sub}" for sub in assuntos]
+    sns.heatmap(data = conf_matrix_percent, xticklabels = ticklabels, yticklabels = ticklabels, annot = True, fmt = '.2f')
+    plt.show()
+
+
+# Gráfico de avaliação
+plot_distribution()
+
+# Resultado do KNN
+plot_confusion(resultados[0])
+
+# Resultado do RandomForest
+plot_confusion(resultados[1])
+
+# Resultado da Regressão Logística
+plot_confusion(resultados[2])
+
+
+# Fim
+
+
