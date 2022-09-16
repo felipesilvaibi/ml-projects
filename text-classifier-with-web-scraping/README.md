@@ -1,10 +1,10 @@
 ## Modelo de Classificação de Texto com Dados Extraídos do Reddit (via web scraping)
 
-**Pre requisitos:**
+**Pré-requisitos:**
 
 1. Criar conta no Reddit
 2. Criar app de dev no Reddit (<https://www.reddit.com/prefs/apps>)
-3. Criar um arquivo **.env** na raiz do projeto, e adicionar as seguintes variáveis no mesmo:
+3. Criar um arquivo **.env** na raiz do projeto e adicionar as seguintes variáveis ao mesmo:
 ```
 ID="reddit_api_id"
 CLIENT_SECRET="reddit_api_secret"
