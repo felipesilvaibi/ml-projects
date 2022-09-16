@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "linear-regressor-public-bonds-investment"
+version = "0.1.0"
+description = ""
+authors = ["felipesilvaibi <felipe_ibirama@hotmail.com>"]
+readme = "README.md"
+packages = [{include = "linear_regressor_public_bonds_investment"}]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
